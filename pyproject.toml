@@ -1,0 +1,76 @@
+[tool.poetry]
+authors = ["OriginAI's Data Eng. Team <dev@originai.co>"]
+description = "A RESTful API using FastAPI"
+name = "fastapi-server"
+version = "0.1.0"
+
+[tool.poetry.dependencies]
+aiofiles = "0.7.0"
+coloredlogs = "15.0.1"
+dependency-injector = "4.35.0"
+fastapi = "0.108.0"
+fastapi-camelcase = "1.0.5"
+httpx = "0.24.1"
+pydantic = "1.10.12"
+python = "~3.9.0"
+pyvim = "3.0.3"
+pyyaml = "6.0.1"
+uvicorn = {version = "0.14.0", extras = ["standard"]}
+psycopg2 = "^2.9.9"
+psycopg2-binary = "^2.9.9"
+
+[tool.poetry.group.dev.dependencies]
+bandit = "1.7.0"
+black = "22.3.0"
+coverage = "5.5"
+flake8 = "6.1.0"
+flake8-bugbear = "23.11.28"
+flake8-isort = "6.1.1"
+flake8-pyproject = "1.2.3"
+flake8-typing-imports = "1.15.0"
+isort = "5.9.3"
+lovely-pytest-docker = "0.3.1"
+mypy = "1.7.1"
+pep8-naming = "0.12.0"
+pylint = "3.0.2"
+pylint-pytest = "1.1.7"
+pytest = "7.4.3"
+pytest-cov = "4.1.0"
+pytest-lazy-fixture = "0.6.3"
+pytest-mock = "3.12.0"
+requests = "2.26.0"
+tox = "3.24.1"
+types-pyyaml = "5.4.3"
+types-requests = "2.25.6"
+
+[[tool.poetry.source]]
+default = true
+name = "arti"
+url = "https://jf.originai.co/artifactory/api/pypi/pypi/simple"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.pytest.ini_options]
+addopts = "--cov-report=term-missing"
+testpaths = ["tests"]
+
+[tool.flake8]
+extend-immutable-calls = ["Depends", "Header", "Query", "Security"]
+max-complexity = 10
+max-line-length = 100
+min-python-version = 3.9
+
+[tool.mypy]
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+strict = true
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.isort]
+line_length = 100
+profile = "black"

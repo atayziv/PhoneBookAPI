@@ -1,0 +1,15 @@
+logging:
+    version: 1
+    formatters:
+        formatter:
+            (): coloredlogs.ColoredFormatter
+            format: "[%(asctime)s] [%(name)s] [%(levelname)s] [%(threadName)s] [%(thread)d] %(message)s"
+    handlers:
+        console:
+            class: "logging.StreamHandler"
+            level: "DEBUG"
+            formatter: "formatter"
+            stream: "ext://sys.stdout"
+    root:
+        level: "DEBUG"
+        handlers: ["console"]
