@@ -3,8 +3,8 @@ from pydantic import Field
 from phone_book_api_server.data_models.base import SharedBaseModel
 
 
-class ContactResponse(SharedBaseModel):
-    first_name: str = Field(description="name")
-    last_name: str = Field(description="last_name")
-    phone_number: str = Field(description="phone_number")
-    adress: str = Field(description="adress")
+class ContactRequest(SharedBaseModel):
+    first_name: str = Field(description="The first name of the contact")
+    last_name: str = Field(description="The last name of the contact")
+    phone_number: str = Field(description="The phone number of the contact")
+    email_address: str = Field(description="The mail adress of the contact")

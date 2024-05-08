@@ -1,7 +1,7 @@
 from dependency_injector.wiring import inject
 from fastapi import APIRouter
 
-from fastapi_server.data_models.health import HealthResponse
+from phone_book_api_server.data_models.health import HealthResponse
 
 router = APIRouter(
     prefix="",

@@ -2,8 +2,8 @@ import logging.config
 
 from dependency_injector import containers, providers
 
-from phone_book_api_server.clients.postgres_client import ExamplesClient
-from phone_book_api_server.services.api_service import ExamplesService
+from phone_book_api_server.clients.postgres_client import PostgresClient
+from phone_book_api_server.services.api_service import ApiService
 
 
 class Container(containers.DeclarativeContainer):
@@ -14,11 +14,11 @@ class Container(containers.DeclarativeContainer):
         config=config.logging,
     )
 
-    examples_client = providers.Singleton(
-        ExamplesClient,
+    postgres_client = providers.Singleton(
+        PostgresClient,
     )
 
-    examples_service = providers.Singleton(
-        ExamplesService,
-        examples_client=examples_client,
+    api_service = providers.Singleton(
+        ApiService,
+        postgres_client=postgres_client,
     )

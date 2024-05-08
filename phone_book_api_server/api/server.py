@@ -10,17 +10,17 @@ from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
-from fastapi_server import SETTINGS
-from fastapi_server.api.routers import examples_router, health_router, index_router
-from fastapi_server.constants import get_from_env
-from fastapi_server.containers import Container
+from phone_book_api_server import SETTINGS
+from phone_book_api_server.api.routers import contact_router, health_router, index_router
+from phone_book_api_server.constants import get_from_env
+from phone_book_api_server.containers import Container
 
 
 def create_container() -> Container:
     container = Container()
     container.config.from_yaml(SETTINGS.CONFIG, required=True, envs_required=True)
     container.init_resources()
-    container.wire(modules=[examples_router, health_router, index_router])
+    container.wire(modules=[contact_router, health_router, index_router])
     return container
 
 
@@ -38,7 +38,7 @@ def create_app() -> FastAPI:
         redoc_url=None,
     )
     _app.extra = {"container": container}
-    _app.include_router(examples_router.router)
+    _app.include_router(contact_router.router)
     _app.include_router(health_router.router)
     _app.include_router(index_router.router)
 

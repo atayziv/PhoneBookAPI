@@ -1,10 +1,10 @@
 import logging
-from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from dependency_injector.wiring import Provide, inject
+from fastapi import APIRouter, Depends, HTTPException
 
 from phone_book_api_server.containers import Container
-from phone_book_api_server.data_models.contacts import ContactResponse
+from phone_book_api_server.data_models.contacts import ContactRequest
 from phone_book_api_server.services.api_service import ApiService
 
 router = APIRouter(
@@ -36,14 +36,18 @@ router = APIRouter(
 #         raise HTTPException(status_code=500, detail="Internal Server Error") from error
 
 
-@router.post("/contacts", response_model=ContactResponse, description="Create a new contact")
+@router.post("/contacts", description="Create a new contact")
+@inject
 def create_contact(
-    contact_data: contactCreate,
-) -> ContactResponse:
+    contact_data: ContactRequest,
+    api_service: ApiService = Depends(Provide[Container.api_service]),
+) -> None:
     """Create a new contact."""
     logger = logging.getLogger(__name__)
     try:
-        return contact_service.create_contact(contact_data)
+        logger.info(f"Trying to add new contact")
+        api_service.insert_contact_data(contact_data)
+        logger.info(f"Successfully added contact: {contact_data.first_name}")
     except Exception as error:
         logger.exception(error)
         raise HTTPException(status_code=500, detail="Internal Server Error") from error
