@@ -1,7 +1,7 @@
 import logging
 
 from phone_book_api_server.clients.postgres_client import PostgresClient
-from phone_book_api_server.data_models.contacts import ContactRequest
+from phone_book_api_server.data_models.contacts import ContactRequest, ContactResponse
 
 
 class ApiService:
@@ -18,3 +18,8 @@ class ApiService:
         self.__logger.info(
             f"Successfully added a new contact with phone number : {contact_data.phone_number}"
         )
+
+    def get_contact_data(self, contact_phone_number: str) -> ContactResponse:
+        self.__logger.debug(f"Getting contact with phone number={contact_phone_number} from the db")
+        contact_data = self.__postgres_client.get_contact(contact_phone_number)
+        contact_response = ContactResponse(phone_number=contact_data.phone_number)

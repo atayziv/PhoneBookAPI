@@ -2,7 +2,7 @@ import logging
 
 import psycopg2
 
-from phone_book_api_server.data_models.contacts import ContactRequest
+from phone_book_api_server.data_models.contacts import ContactRequest, ContactResponse
 
 
 class PostgresClient:
@@ -17,7 +17,7 @@ class PostgresClient:
         )
         self.__create_table()
 
-    def __create_table(self):
+    def __create_table(self) -> None:
         cursor = self.connection.cursor()
         cursor.execute(
             """CREATE TABLE IF NOT EXISTS contacts(
@@ -32,7 +32,7 @@ class PostgresClient:
         cursor.close()
         # self.connection.close()
 
-    def insert_contact(self, data: ContactRequest):
+    def insert_contact(self, data: ContactRequest) -> None:
         cursor = self.connection.cursor()
         cursor.execute(
             "INSERT INTO contacts (phone_number, first_name, last_name, email_address) VALUES (%s, %s, %s, %s)",
@@ -43,6 +43,13 @@ class PostgresClient:
                 data.email_address,
             ),
         )
-
+        self.connection.commit()
         cursor.close()
-        # self.connection.close()
+
+    def get_contact(self, contact_phone_number: str) -> ContactResponse:
+        cursor = self.connection.cursor()
+        cursor.execute("SELECT * FROM contacts WHERE phone_number = %s;", (contact_phone_number,))
+        data = cursor.fetchall()
+        self.connection.commit()
+        cursor.close()
+        return data
