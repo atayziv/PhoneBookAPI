@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from dependency_injector.wiring import inject
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,6 +10,7 @@ from phone_book_api_server.clients.db_client import (
     create_contact,
     delete_contact,
     get_contact,
+    get_contacts_list,
     update_contact,
 )
 from phone_book_api_server.data_models.contacts import (
@@ -55,6 +57,29 @@ def get_existing_contact(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="contact not found in db"
         ) from error
+    except Exception as error:
+        logger.exception(error)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error"
+        ) from error
+
+
+@router.get(
+    "/contacts/",
+    response_model=List[ContactResponse],
+    description="Get contacts with pagination",
+)
+@inject
+def get_contacts_with_limit(
+    db: Session = Depends(get_db),
+) -> List[ContactResponse]:
+    """Get a contact by its phone number."""
+    logger = logging.getLogger(__name__)
+    try:
+        logger.info(f"Trying to get from db contants with pagination")
+        contacts_list_response = get_contacts_list(db=db)
+        logger.info(f"successfully got list of contants")
+        return contacts_list_response
     except Exception as error:
         logger.exception(error)
         raise HTTPException(

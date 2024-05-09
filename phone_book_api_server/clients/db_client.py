@@ -24,18 +24,20 @@ def create_contact(db: Session, contact: ContactRequest) -> ContactResponse:
     return db_contact
 
 
-def get_all_contacts(db: Session) -> List[ContactResponse]:
-    return db.query(Contacts).all()
+def get_contacts_list(db: Session) -> List[ContactResponse]:
+    contacts_list = db.query(Contacts).limit(10).all()
+    return contacts_list
 
 
 def get_contact(db: Session, contact_phone_number: str) -> ContactResponse:
     contact_data = db.query(Contacts).filter_by(phone_number=contact_phone_number).one()
-    return ContactResponse(
-        phone_number=contact_data.phone_number,
-        first_name=contact_data.first_name,
-        last_name=contact_data.last_name,
-        email_address=contact_data.email_address,
-    )
+    return contact_data
+    # return ContactResult(
+    #     phone_number=contact_data.phone_number,
+    #     first_name=contact_data.first_name,
+    #     last_name=contact_data.last_name,
+    #     email_address=contact_data.email_address,
+    # )
 
 
 def update_contact(
@@ -55,12 +57,13 @@ def update_contact(
     db.commit()
 
     updated_contact = db.query(Contacts).filter_by(phone_number=contact_phone_number).one()
-    return ContactResponse(
-        phone_number=updated_contact.phone_number,
-        first_name=updated_contact.first_name,
-        last_name=updated_contact.last_name,
-        email_address=updated_contact.email_address,
-    )
+    return updated_contact
+    # return ContactResponse(
+    #     phone_number=updated_contact.phone_number,
+    #     first_name=updated_contact.first_name,
+    #     last_name=updated_contact.last_name,
+    #     email_address=updated_contact.email_address,
+    # )
 
 
 def delete_contact(db: Session, contact_phone_number: str) -> DeleteContactResponse:
