@@ -15,10 +15,6 @@ class Container(containers.DeclarativeContainer):
         config=config.logging,
     )
 
-    # postgres_client = providers.Singleton(
-    #     DbClient,
-    # )
-
     # api_service = providers.Singleton(
     #     ApiService,
     #     postgres_client=postgres_client,
