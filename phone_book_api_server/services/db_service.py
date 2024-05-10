@@ -1,58 +1,53 @@
 import re
-from typing import Any, Dict, List
+from typing import List
 
 import phonenumbers
 from data_models.db import DeleteContactResponse
-from database.models import Base, Contacts
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from database.models import Contacts
 
+from phone_book_api_server.clients.db_client import PostgreSQLClient
 from phone_book_api_server.constants import SETTINGS
 from phone_book_api_server.data_models.contacts import (
     ContactRequest,
     ContactResponse,
     UpdateContactRequest,
 )
-from phone_book_api_server.exceptions.contact import ContactNotFoundError
+from phone_book_api_server.exceptions.contact import ContactNotFoundError, InvalidContactParams
 
 
 class DbService:
     """DataBase CRUD Service."""
 
-    def __init__(self, config: Dict[str, Any]) -> None:
-        engine = create_engine(SETTINGS.DATABASE_URL)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        Base.metadata.create_all(engine)
+    def __init__(self, db_client: PostgreSQLClient) -> None:
+        self.__db_client = db_client
 
     def insert_contact(self, contact_request: ContactRequest) -> ContactResponse:
-        db = self.SessionLocal()
         new_contact = Contacts(**contact_request.__dict__)
-        db.add(new_contact)
-        db.commit()
-        db.refresh(new_contact)
-        contact_response = ContactResponse(**contact_request.__dict__)
-        if contact_request.email_address:
-            contact_response.email_address = contact_request.email_address
-        db.close()
-        return contact_response
+        if (
+            self._is_valid_number(new_contact.phone_number)
+            and self._is_valid_email(new_contact.email_address)
+            and self._is_valid_name(new_contact.first_name)
+            and self._is_valid_name(new_contact.last_name)
+        ):
+            self.__db_client.insert_contact(new_contact)
+            contact_response = self.get_contact(contact_request.phone_number)
+            return contact_response
+        raise InvalidContactParams(
+            detail=f"One of the parameters of the contact person is incorrect."
+        )
 
     def get_contacts_list(self, limit_contacts_list: int) -> List[ContactResponse]:
-        db = self.SessionLocal()
-        contacts_list = db.query(Contacts).limit(limit_contacts_list).all()
-        db.close()
+        contacts_list = self.__db_client.get_contacts(limit_contacts_list)
         return contacts_list
 
     def get_contact(self, contact_phone_number: str) -> ContactResponse:
-        db = self.SessionLocal()
-        contact_data = db.query(Contacts).filter_by(phone_number=contact_phone_number).one()
+        contact_data = self.__db_client.get_contact(contact_phone_number)
         contact_response = ContactResponse(**contact_data.__dict__)
-        db.close()
         return contact_response
 
     def update_contact(
         self, contact_data_update_request: UpdateContactRequest, contact_phone_number: str
     ) -> ContactResponse:
-        db = self.SessionLocal()
         contact_data = ContactResponse(**self.get_contact(contact_phone_number).__dict__)
         if contact_data:
             if self._is_valid_number(contact_data_update_request.phone_number) and self._is_changed(
@@ -75,25 +70,18 @@ class DbService:
                 target_object=contact_data_update_request.email_address,
             ):
                 contact_data.email_address = contact_data_update_request.email_address
-            db.query(Contacts).filter_by(phone_number=contact_phone_number).update(
-                contact_data.__dict__
-            )
-            db.commit()
+            self.__db_client.update_contact(contact_data)
             updated_contact = self.get_contact(contact_data.phone_number)
-            db.close()
             return updated_contact
         raise ContactNotFoundError
 
     def delete_contact(self, contact_phone_number: str) -> DeleteContactResponse:
-        db = self.SessionLocal()
-        contact = db.query(Contacts).filter_by(phone_number=contact_phone_number).all()
+        contact = self.get_contact(contact_phone_number)
         if not contact:
             return DeleteContactResponse(
                 detail=f"The Contact with phone number {contact_phone_number} doesn't exist"
             )
-        db.query(Contacts).filter_by(phone_number=contact_phone_number).delete()
-        db.commit()
-        db.close()
+        self.__db_client.delete_contact(contact_phone_number)
         return DeleteContactResponse(
             detail=f"Contact with phone number {contact_phone_number} has been successfully deleted."
         )
