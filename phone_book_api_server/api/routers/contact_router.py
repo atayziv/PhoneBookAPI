@@ -3,6 +3,7 @@ from typing import List
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException
+from phonenumbers import NumberParseException
 from starlette import status
 
 from phone_book_api_server.containers import Container
@@ -32,7 +33,7 @@ router = APIRouter(
     description="Get a contact by ID",
 )
 @inject
-def get_existing_contact(
+def get_contact(
     contact_phone_number: str,
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> ContactResponse:
@@ -64,13 +65,14 @@ def get_existing_contact(
 )
 @inject
 def get_contacts_with_limit(
+    config=Depends(Provide[Container.config]),
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> List[ContactResponse]:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to get from db contants with pagination")
-        contacts_list_response = db_service.get_contacts_list()
+        contacts_list_response = db_service.get_contacts_list(config.get("limit_contacts_list"))
         logger.info(f"successfully got list of contants")
         return contacts_list_response
     except Exception as error:
@@ -82,7 +84,7 @@ def get_contacts_with_limit(
 
 @router.post("/contacts", response_model=ContactResponse, description="Create a new contact")
 @inject
-def create_new_contact(
+def create_contact(
     contact_data: ContactRequest,
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> None:
@@ -92,7 +94,7 @@ def create_new_contact(
         logger.info(
             f"Trying to add contact {contact_data.first_name} {contact_data.last_name} to the db"
         )
-        contact_response = db_service.create_contact(contact=contact_data)
+        contact_response = db_service.insert_contact(contact_data)
         logger.info(
             f"Successfully added contact: {contact_data.first_name} {contact_data.last_name}"
         )
@@ -111,7 +113,7 @@ def create_new_contact(
     description="Update an existing contact",
 )
 @inject
-def update_existing_contact(
+def update_contact(
     contact_phone_number: str,
     contact_data: UpdateContactRequest,
     db_service: DbService = Depends(Provide[Container.db_service]),
@@ -120,13 +122,16 @@ def update_existing_contact(
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to update contact: {contact_data.first_name} {contact_data.last_name}")
-        contact_response = db_service.update_contact(
-            contact_data=contact_data, contact_phone_number=contact_phone_number
-        )
+        contact_response = db_service.update_contact(contact_data, contact_phone_number)
         logger.info(
             f"Successfully updated contact: {contact_data.first_name} {contact_data.last_name}"
         )
         return contact_response
+    except NumberParseException as error:
+        logger.exception(error)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing digits or invalid region "
+        )
     except ContactNotFoundError as error:
         logger.exception(error)
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="contact not found") from error
@@ -143,7 +148,7 @@ def update_existing_contact(
     description="Delete a contact by ID",
 )
 @inject
-def delete_existing_contact(
+def delete_contact(
     contact_phone_number: str,
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> DeleteContactResponse:

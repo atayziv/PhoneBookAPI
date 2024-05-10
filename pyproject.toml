@@ -20,6 +20,7 @@ psycopg2 = "^2.9.9"
 psycopg2-binary = "^2.9.9"
 sqlalchemy = "^2.0.30"
 python-dotenv = "^1.0.1"
+phonenumbers = "^8.13.36"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "1.7.0"

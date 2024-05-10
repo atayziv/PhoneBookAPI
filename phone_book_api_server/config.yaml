@@ -13,3 +13,5 @@ logging:
     root:
         level: "DEBUG"
         handlers: ["console"]
+        
+limit_contacts_list : 10

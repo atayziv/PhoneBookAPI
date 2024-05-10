@@ -1157,6 +1157,22 @@ url = "https://jf.originai.co/artifactory/api/pypi/pypi/simple"
 reference = "arti"
 
 [[package]]
+name = "phonenumbers"
+version = "8.13.36"
+description = "Python version of Google's common library for parsing, formatting, storing and validating international phone numbers."
+optional = false
+python-versions = "*"
+files = [
+    {file = "phonenumbers-8.13.36-py2.py3-none-any.whl", hash = "sha256:68e06d20ae2f8fe5c7c7fd5b433f4257bc3cc747dc5196a029c7898ea449b012"},
+    {file = "phonenumbers-8.13.36.tar.gz", hash = "sha256:b4e2371e35a1172aa2c91c9200b1e48e87b9355eb575768dd38058fc8d72c9ff"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://jf.originai.co/artifactory/api/pypi/pypi/simple"
+reference = "arti"
+
+[[package]]
 name = "platformdirs"
 version = "4.2.1"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
@@ -2315,4 +2331,4 @@ reference = "arti"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9.0"
-content-hash = "eec3fef566513fcfa3f31c52c771ecb5aff7f092ca8fa8cafa11724597154fbc"
+content-hash = "5402257708d1e2d96a122c1523cff6456ed883600b8802c27710ffb00c3b5152"
