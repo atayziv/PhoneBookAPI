@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from phone_book_api_server import SETTINGS
-from phone_book_api_server.api.routers import contact_router, health_router, index_router
+from phone_book_api_server.api.routers import contact_router, index_router
 from phone_book_api_server.constants import get_from_env
 from phone_book_api_server.containers import Container
 
@@ -20,7 +20,7 @@ def create_container() -> Container:
     container = Container()
     container.config.from_yaml(SETTINGS.CONFIG, required=True, envs_required=True)
     container.init_resources()
-    container.wire(modules=[contact_router, health_router, index_router])
+    container.wire(modules=[contact_router, index_router])
     return container
 
 
@@ -39,7 +39,6 @@ def create_app() -> FastAPI:
     )
     _app.extra = {"container": container}
     _app.include_router(contact_router.router)
-    _app.include_router(health_router.router)
     _app.include_router(index_router.router)
 
     logger.info(f"FastAPI server {SETTINGS.NAME} v{SETTINGS.VERSION} is up and running!")

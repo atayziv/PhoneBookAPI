@@ -13,3 +13,6 @@ logging:
     root:
         level: "DEBUG"
         handlers: ["console"]
+
+postgres:
+    connection_string: "postgresql:///?user=postgres&password=postgres&database=postgres&host=localhost&port=5432"

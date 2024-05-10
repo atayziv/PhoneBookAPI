@@ -9,7 +9,7 @@ class ContactRequest(SharedBaseModel):
     first_name: str = Field(description="The first name of the contact")
     last_name: str = Field(description="The last name of the contact")
     phone_number: str = Field(description="The phone number of the contact")
-    email_address: str = Field(description="The mail adress of the contact")
+    email_address: Optional[str] = Field(description="The mail adress of the contact")
 
     class Config:
         orm_mode = True
@@ -19,7 +19,7 @@ class ContactResponse(SharedBaseModel):
     first_name: str = Field(description="The first name of the contact")
     last_name: str = Field(description="The last name of the contact")
     phone_number: str = Field(description="The phone number of the contact")
-    email_address: str = Field(description="The mail adress of the contact")
+    email_address: Optional[str] = Field(description="The mail adress of the contact")
 
     class Config:
         orm_mode = True
