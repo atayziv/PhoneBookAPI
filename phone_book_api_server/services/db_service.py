@@ -5,6 +5,7 @@ from database.models import Base, Contacts
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from phone_book_api_server.constants import SETTINGS
 from phone_book_api_server.data_models.contacts import (
     ContactRequest,
     ContactResponse,
@@ -16,7 +17,7 @@ class DbService:
     """DataBase CRUD Service."""
 
     def __init__(self, config: Dict[str, Any]) -> None:
-        engine = create_engine(config["postgres"]["connection_string"])
+        engine = create_engine(SETTINGS.DATABASE_URL)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         Base.metadata.create_all(engine)
 

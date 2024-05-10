@@ -2315,4 +2315,4 @@ reference = "arti"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9.0"
-content-hash = "0b93cf2febadc41b690abeee57ed6dc717b2ed2148b2c7b211384edd0dc3089c"
+content-hash = "eec3fef566513fcfa3f31c52c771ecb5aff7f092ca8fa8cafa11724597154fbc"
