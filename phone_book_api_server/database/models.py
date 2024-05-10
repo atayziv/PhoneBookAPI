@@ -1,4 +1,3 @@
-from database.connection import Base, engine
 from sqlalchemy import Column, String
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -12,6 +11,3 @@ class Contacts(Base):
     first_name = Column("first_name", String, nullable=False)
     last_name = Column("last_name", String, nullable=False)
     email_address = Column("email_address", String, nullable=True)
-
-
-Base.metadata.create_all(engine)

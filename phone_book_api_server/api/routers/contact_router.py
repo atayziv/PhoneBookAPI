@@ -3,7 +3,6 @@ from typing import List
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
 from starlette import status
 
 from phone_book_api_server.containers import Container
@@ -13,7 +12,6 @@ from phone_book_api_server.data_models.contacts import (
     UpdateContactRequest,
 )
 from phone_book_api_server.data_models.db import DeleteContactResponse
-from phone_book_api_server.database.connection import get_db
 from phone_book_api_server.exceptions.contact import ContactNotFoundError
 from phone_book_api_server.services.db_service import DbService
 
@@ -36,14 +34,13 @@ router = APIRouter(
 @inject
 def get_existing_contact(
     contact_phone_number: str,
-    db: Session = Depends(get_db),
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> ContactResponse:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to get contact with his phone number =({contact_phone_number})")
-        contact_response = db_service.get_contact(db, contact_phone_number)
+        contact_response = db_service.get_contact(contact_phone_number)
         logger.info(
             f"successfully got contact {contact_response.first_name} {contact_response.last_name})"
         )
@@ -67,14 +64,13 @@ def get_existing_contact(
 )
 @inject
 def get_contacts_with_limit(
-    db: Session = Depends(get_db),
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> List[ContactResponse]:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to get from db contants with pagination")
-        contacts_list_response = db_service.get_contacts_list(db)
+        contacts_list_response = db_service.get_contacts_list()
         logger.info(f"successfully got list of contants")
         return contacts_list_response
     except Exception as error:
@@ -88,7 +84,6 @@ def get_contacts_with_limit(
 @inject
 def create_new_contact(
     contact_data: ContactRequest,
-    db: Session = Depends(get_db),
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> None:
     """Create a new contact."""
@@ -97,7 +92,7 @@ def create_new_contact(
         logger.info(
             f"Trying to add contact {contact_data.first_name} {contact_data.last_name} to the db"
         )
-        contact_response = db_service.create_contact(db=db, contact=contact_data)
+        contact_response = db_service.create_contact(contact=contact_data)
         logger.info(
             f"Successfully added contact: {contact_data.first_name} {contact_data.last_name}"
         )
@@ -119,7 +114,6 @@ def create_new_contact(
 def update_existing_contact(
     contact_phone_number: str,
     contact_data: UpdateContactRequest,
-    db: Session = Depends(get_db),
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> ContactResponse:
     """Update an existing contact."""
@@ -127,7 +121,7 @@ def update_existing_contact(
     try:
         logger.info(f"Trying to update contact: {contact_data.first_name} {contact_data.last_name}")
         contact_response = db_service.update_contact(
-            db=db, contact_data=contact_data, contact_phone_number=contact_phone_number
+            contact_data=contact_data, contact_phone_number=contact_phone_number
         )
         logger.info(
             f"Successfully updated contact: {contact_data.first_name} {contact_data.last_name}"
@@ -151,16 +145,13 @@ def update_existing_contact(
 @inject
 def delete_existing_contact(
     contact_phone_number: str,
-    db: Session = Depends(get_db),
     db_service: DbService = Depends(Provide[Container.db_service]),
 ) -> DeleteContactResponse:
     """Delete a contact by its ID."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to delete contact with his phone number : {contact_phone_number}")
-        delete_response = db_service.delete_contact(
-            db=db, contact_phone_number=contact_phone_number
-        )
+        delete_response = db_service.delete_contact(contact_phone_number=contact_phone_number)
         logger.info(f"successfully deleted contact whith phone number :  {contact_phone_number})")
         return delete_response
     except ContactNotFoundError as error:

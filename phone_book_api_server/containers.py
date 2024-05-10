@@ -16,4 +16,4 @@ class Container(containers.DeclarativeContainer):
         config=config.logging,
     )
 
-    db_service = providers.Singleton(DbService)
+    db_service = providers.Singleton(DbService, config)
