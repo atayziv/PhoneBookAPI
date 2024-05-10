@@ -14,7 +14,7 @@ from phone_book_api_server.data_models.contacts import (
 class DbService:
     """DataBase CRUD Service."""
 
-    def create_contact(db: Session, contact: ContactRequest) -> ContactResponse:
+    def create_contact(self, db: Session, contact: ContactRequest) -> ContactResponse:
         db_contact = Contacts(
             phone_number=contact.phone_number,
             first_name=contact.first_name,
