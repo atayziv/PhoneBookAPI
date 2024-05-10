@@ -17,8 +17,8 @@ from phone_book_api_server.exceptions.contact import ContactNotFoundError
 from phone_book_api_server.services.db_service import DbService
 
 router = APIRouter(
-    prefix="",
-    tags=["Videos Processor"],
+    prefix="/contacts",
+    tags=["Contacts Processor"],
     responses={
         status.HTTP_200_OK: {"description": "OK"},
         status.HTTP_400_BAD_REQUEST: {"description": "Bad Request"},
@@ -28,7 +28,7 @@ router = APIRouter(
 
 
 @router.get(
-    "/contacts/{contact_phone_number}",
+    "/{contact_phone_number}",
     response_model=ContactResponse,
     description="Get a contact by ID",
 )
@@ -59,7 +59,7 @@ def get_contact(
 
 
 @router.get(
-    "/contacts/",
+    "/",
     response_model=List[ContactResponse],
     description="Get contacts with pagination",
 )
@@ -82,7 +82,7 @@ def get_contacts_with_limit(
         ) from error
 
 
-@router.post("/contacts", response_model=ContactResponse, description="Create a new contact")
+@router.post("/", response_model=ContactResponse, description="Create a new contact")
 @inject
 def create_contact(
     contact_data: ContactRequest,
@@ -108,7 +108,7 @@ def create_contact(
 
 
 @router.put(
-    "/contacts/{contact_phone_number}",
+    "/{contact_phone_number}",
     response_model=ContactResponse,
     description="Update an existing contact",
 )
@@ -143,7 +143,7 @@ def update_contact(
 
 
 @router.delete(
-    "/contacts/{contact_phone_number}",
+    "/{contact_phone_number}",
     response_model=DeleteContactResponse,
     description="Delete a contact by ID",
 )
