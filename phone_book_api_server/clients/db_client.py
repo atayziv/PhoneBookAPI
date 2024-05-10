@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 from phone_book_api_server.constants import SETTINGS
 from phone_book_api_server.data_models.contacts import ContactResponse
+from phone_book_api_server.exceptions.contact import ContactAlreadyExist, ContactNotFoundError
 
 
 class PostgreSQLClient:
@@ -30,6 +31,8 @@ class PostgreSQLClient:
             db.commit()
             db.refresh(new_contact)
             self.__logger.info("Data has been successfully inserted into the 'contacts' table.")
+        except:
+            raise ContactAlreadyExist
         finally:
             db.close()
 
@@ -52,6 +55,8 @@ class PostgreSQLClient:
             contact_data = db.query(Contacts).filter_by(phone_number=contact_phone_number).one()
             self.__logger.info("Successfully got contact from 'contacts' table.")
             return contact_data
+        except:
+            raise ContactNotFoundError
         finally:
             db.close()
 
@@ -64,6 +69,8 @@ class PostgreSQLClient:
             )
             db.commit()
             self.__logger.info("Successfully updated contact on 'contacts' table.")
+        except:
+            raise ContactAlreadyExist
         finally:
             db.close()
 

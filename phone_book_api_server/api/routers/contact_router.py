@@ -3,7 +3,6 @@ from typing import List
 
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, HTTPException
-from phonenumbers import NumberParseException
 from starlette import status
 
 from phone_book_api_server.containers import Container
@@ -13,8 +12,12 @@ from phone_book_api_server.data_models.contacts import (
     UpdateContactRequest,
 )
 from phone_book_api_server.data_models.db import DeleteContactResponse
-from phone_book_api_server.exceptions.contact import ContactNotFoundError
-from phone_book_api_server.services.db_service import DbService
+from phone_book_api_server.exceptions.contact import (
+    ContactAlreadyExist,
+    ContactNotFoundError,
+    InvalidContactParams,
+)
+from phone_book_api_server.services.contact_service import DbService
 
 router = APIRouter(
     prefix="/contacts",
@@ -46,6 +49,9 @@ def get_contact(
             f"successfully got contact {contact_response.first_name} {contact_response.last_name})"
         )
         return contact_response
+    except InvalidContactParams as error:
+        logger.exception(error)
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
     except ContactNotFoundError as error:
         logger.exception(error)
         raise HTTPException(
@@ -99,6 +105,13 @@ def create_contact(
             f"Successfully added contact: {contact_data.first_name} {contact_data.last_name}"
         )
         return contact_response
+    except InvalidContactParams as error:
+        logger.exception(error)
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
+    except ContactAlreadyExist as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Contact Already Exist in db."
+        ) from error
     except Exception as error:
         logger.exception(error)
         raise HTTPException(
@@ -127,14 +140,16 @@ def update_contact(
             f"Successfully updated contact: {contact_data.first_name} {contact_data.last_name}"
         )
         return contact_response
-    except NumberParseException as error:
+    except InvalidContactParams as error:
         logger.exception(error)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Missing digits or invalid region "
-        )
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
     except ContactNotFoundError as error:
         logger.exception(error)
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="contact not found") from error
+    except ContactAlreadyExist as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Contact Already Exist in db."
+        ) from error
     except Exception as error:
         logger.exception(error)
         raise HTTPException(
@@ -159,6 +174,9 @@ def delete_contact(
         delete_response = db_service.delete_contact(contact_phone_number=contact_phone_number)
         logger.info(f"successfully deleted contact whith phone number :  {contact_phone_number})")
         return delete_response
+    except InvalidContactParams as error:
+        logger.exception(error)
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=str(error)) from error
     except ContactNotFoundError as error:
         logger.exception(error)
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="contact not found") from error
