@@ -99,6 +99,7 @@ class ContactService:
             parsed_number = phonenumbers.parse(phone_number, None)
             if phonenumbers.is_valid_number(parsed_number):
                 return True
+            raise
         except:
             raise InvalidContactNumber(detail="Invalid phone number.")
 
