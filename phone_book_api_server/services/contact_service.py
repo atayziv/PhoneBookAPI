@@ -84,10 +84,6 @@ class DbService:
             )
         raise InvalidContactNumber(detail=f"Invalid contact phone number.")
 
-    def _is_changed(self, source_object: str, target_object: str) -> bool:
-        if target_object:
-            return bool(source_object != target_object)
-
     def _is_valid_number(self, phone_number: str) -> bool:
         try:
             parsed_number = phonenumbers.parse(phone_number, None)
