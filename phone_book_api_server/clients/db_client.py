@@ -3,8 +3,10 @@
 import logging
 from typing import List
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy
+
+# from sqlalchemy.orm import sessionmaker
+from sqlalchemy import orm
 
 from phone_book_api_server.constants import SETTINGS
 from phone_book_api_server.data_models.contacts import ContactResponse
@@ -17,8 +19,8 @@ class PostgreSQLClient:
 
     def __init__(self) -> None:
         self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
-        engine = create_engine(SETTINGS.DATABASE_URL)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+        engine = sqlalchemy.create_engine(SETTINGS.DATABASE_URL)
+        self.SessionLocal = orm.sessionmaker(autocommit=False, autoflush=False, bind=engine)
         Base.metadata.create_all(engine)
 
     def insert_contact(self, new_contact: Contacts) -> None:
