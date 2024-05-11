@@ -38,13 +38,13 @@ router = APIRouter(
 @inject
 def get_contact(
     contact_phone_number: str,
-    db_service: ContactService = Depends(Provide[Container.db_service]),
+    contact_service: ContactService = Depends(Provide[Container.contact_service]),
 ) -> ContactResponse:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to get contact with his phone number =({contact_phone_number})")
-        contact_response = db_service.get_contact(contact_phone_number)
+        contact_response = contact_service.get_contact(contact_phone_number)
         logger.info(
             f"successfully got contact {contact_response.first_name} {contact_response.last_name})"
         )
@@ -72,13 +72,15 @@ def get_contact(
 @inject
 def get_contacts_with_limit(
     config=Depends(Provide[Container.config]),
-    db_service: ContactService = Depends(Provide[Container.db_service]),
+    contact_service: ContactService = Depends(Provide[Container.contact_service]),
 ) -> List[ContactResponse]:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to get from db contants with pagination")
-        contacts_list_response = db_service.get_contacts_list(config.get("limit_contacts_list"))
+        contacts_list_response = contact_service.get_contacts_list(
+            config.get("limit_contacts_list")
+        )
         logger.info(f"successfully got list of contants")
         return contacts_list_response
     except Exception as error:
@@ -92,7 +94,7 @@ def get_contacts_with_limit(
 @inject
 def create_contact(
     contact_data: ContactRequest,
-    db_service: ContactService = Depends(Provide[Container.db_service]),
+    contact_service: ContactService = Depends(Provide[Container.contact_service]),
 ) -> None:
     """Create a new contact."""
     logger = logging.getLogger(__name__)
@@ -100,7 +102,7 @@ def create_contact(
         logger.info(
             f"Trying to add contact {contact_data.first_name} {contact_data.last_name} to the db"
         )
-        contact_response = db_service.insert_contact(contact_data)
+        contact_response = contact_service.insert_contact(contact_data)
         logger.info(
             f"Successfully added contact: {contact_data.first_name} {contact_data.last_name}"
         )
@@ -129,13 +131,13 @@ def create_contact(
 def update_contact(
     contact_phone_number: str,
     contact_data: UpdateContactRequest,
-    db_service: ContactService = Depends(Provide[Container.db_service]),
+    contact_service: ContactService = Depends(Provide[Container.contact_service]),
 ) -> ContactResponse:
     """Update an existing contact."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to update contact: {contact_data.first_name} {contact_data.last_name}")
-        contact_response = db_service.update_contact(contact_data, contact_phone_number)
+        contact_response = contact_service.update_contact(contact_data, contact_phone_number)
         logger.info(
             f"Successfully updated contact: {contact_data.first_name} {contact_data.last_name}"
         )
@@ -165,13 +167,13 @@ def update_contact(
 @inject
 def delete_contact(
     contact_phone_number: str,
-    db_service: ContactService = Depends(Provide[Container.db_service]),
+    contact_service: ContactService = Depends(Provide[Container.contact_service]),
 ) -> DeleteContactResponse:
     """Delete a contact by its ID."""
     logger = logging.getLogger(__name__)
     try:
         logger.info(f"Trying to delete contact with his phone number : {contact_phone_number}")
-        delete_response = db_service.delete_contact(contact_phone_number=contact_phone_number)
+        delete_response = contact_service.delete_contact(contact_phone_number=contact_phone_number)
         logger.info(f"successfully deleted contact whith phone number :  {contact_phone_number})")
         return delete_response
     except InvalidContactParams as error:
