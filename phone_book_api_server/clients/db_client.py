@@ -3,21 +3,19 @@
 import logging
 from typing import List
 
-from database.models import Base, Contacts
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from phone_book_api_server.constants import SETTINGS
 from phone_book_api_server.data_models.contacts import ContactResponse
+from phone_book_api_server.database.models import Base, Contacts
 from phone_book_api_server.exceptions.contact import ContactAlreadyExist, ContactNotFoundError
 
 
 class PostgreSQLClient:
     """PostgreSQL Client Class."""
 
-    def __init__(
-        self,
-    ) -> None:
+    def __init__(self) -> None:
         self.__logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         engine = create_engine(SETTINGS.DATABASE_URL)
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

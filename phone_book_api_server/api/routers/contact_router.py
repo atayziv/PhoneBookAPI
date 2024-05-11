@@ -17,7 +17,7 @@ from phone_book_api_server.exceptions.contact import (
     ContactNotFoundError,
     InvalidContactParams,
 )
-from phone_book_api_server.services.contact_service import DbService
+from phone_book_api_server.services.contact_service import ContactService
 
 router = APIRouter(
     prefix="/contacts",
@@ -38,7 +38,7 @@ router = APIRouter(
 @inject
 def get_contact(
     contact_phone_number: str,
-    db_service: DbService = Depends(Provide[Container.db_service]),
+    db_service: ContactService = Depends(Provide[Container.db_service]),
 ) -> ContactResponse:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ def get_contact(
 @inject
 def get_contacts_with_limit(
     config=Depends(Provide[Container.config]),
-    db_service: DbService = Depends(Provide[Container.db_service]),
+    db_service: ContactService = Depends(Provide[Container.db_service]),
 ) -> List[ContactResponse]:
     """Get a contact by its phone number."""
     logger = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ def get_contacts_with_limit(
 @inject
 def create_contact(
     contact_data: ContactRequest,
-    db_service: DbService = Depends(Provide[Container.db_service]),
+    db_service: ContactService = Depends(Provide[Container.db_service]),
 ) -> None:
     """Create a new contact."""
     logger = logging.getLogger(__name__)
@@ -129,7 +129,7 @@ def create_contact(
 def update_contact(
     contact_phone_number: str,
     contact_data: UpdateContactRequest,
-    db_service: DbService = Depends(Provide[Container.db_service]),
+    db_service: ContactService = Depends(Provide[Container.db_service]),
 ) -> ContactResponse:
     """Update an existing contact."""
     logger = logging.getLogger(__name__)
@@ -165,7 +165,7 @@ def update_contact(
 @inject
 def delete_contact(
     contact_phone_number: str,
-    db_service: DbService = Depends(Provide[Container.db_service]),
+    db_service: ContactService = Depends(Provide[Container.db_service]),
 ) -> DeleteContactResponse:
     """Delete a contact by its ID."""
     logger = logging.getLogger(__name__)

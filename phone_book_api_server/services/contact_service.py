@@ -1,9 +1,9 @@
+""""Contact Service."""
+
 import re
 from typing import List
 
 import phonenumbers
-from data_models.db import DeleteContactResponse
-from database.models import Contacts
 
 from phone_book_api_server.clients.db_client import PostgreSQLClient
 from phone_book_api_server.data_models.contacts import (
@@ -11,6 +11,8 @@ from phone_book_api_server.data_models.contacts import (
     ContactResponse,
     UpdateContactRequest,
 )
+from phone_book_api_server.data_models.db import DeleteContactResponse
+from phone_book_api_server.database.models import Contacts
 from phone_book_api_server.exceptions.contact import (
     InvalidContactEmail,
     InvalidContactName,
@@ -18,20 +20,27 @@ from phone_book_api_server.exceptions.contact import (
 )
 
 
-class DbService:
-    """DataBase CRUD Service."""
+class ContactService:
+    """Contact CRUD Class."""
 
     def __init__(self, db_client: PostgreSQLClient) -> None:
         self.__db_client = db_client
 
     def insert_contact(self, contact_request: ContactRequest) -> ContactResponse:
-        new_contact = Contacts(**contact_request.__dict__)
         if (
-            self._is_valid_number(new_contact.phone_number)
-            and self._is_valid_email(new_contact.email_address)
-            and self._is_valid_name(new_contact.first_name)
-            and self._is_valid_name(new_contact.last_name)
+            self._is_valid_number(contact_request.phone_number)
+            and self._is_valid_name(contact_request.first_name)
+            and self._is_valid_name(contact_request.last_name)
         ):
+            new_contact = Contacts(
+                phone_number=contact_request.phone_number,
+                first_name=contact_request.first_name,
+                last_name=contact_request.last_name,
+            )
+            if contact_request.email_address and self._is_valid_email(
+                contact_request.email_address
+            ):
+                new_contact.email_address = contact_request.email_address
             self.__db_client.insert_contact(new_contact)
             contact_response = self.get_contact(contact_request.phone_number)
             return contact_response
@@ -50,20 +59,21 @@ class DbService:
     def update_contact(
         self, contact_data_update_request: UpdateContactRequest, contact_phone_number: str
     ) -> ContactResponse:
-        contact_data = ContactResponse(**self.get_contact(contact_phone_number).__dict__)
+        contact_request = self.get_contact(contact_phone_number)
+        contact_data = ContactResponse(**contact_request.__dict__)
         if contact_data_update_request.phone_number and self._is_valid_number(
             contact_data_update_request.phone_number
         ):
             contact_data.phone_number = contact_data_update_request.phone_number
-        elif contact_data_update_request.first_name and self._is_valid_name(
+        if contact_data_update_request.first_name and self._is_valid_name(
             contact_data_update_request.first_name
         ):
             contact_data.first_name = contact_data_update_request.first_name
-        elif contact_data_update_request.last_name and self._is_valid_name(
+        if contact_data_update_request.last_name and self._is_valid_name(
             contact_data_update_request.last_name
         ):
             contact_data.last_name = contact_data_update_request.last_name
-        elif contact_data_update_request.email_address and self._is_valid_email(
+        if contact_data_update_request.email_address and self._is_valid_email(
             contact_data_update_request.email_address
         ):
             contact_data.email_address = contact_data_update_request.email_address

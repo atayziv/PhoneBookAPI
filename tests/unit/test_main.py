@@ -1,6 +1,6 @@
 from pytest_mock import MockerFixture
 
-from fastapi_server import __main__
+from phone_book_api_server import __main__
 
 
 def test_init(mocker: MockerFixture) -> None:
