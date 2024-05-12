@@ -1,0 +1,32 @@
+# docker-compose.yml
+
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    container_name: db
+    ports:
+      - '5432:5432'
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+    - POSTGRES_DB=postgres
+    volumes:
+    - db:/var/lib/postgresql/data
+
+  phone-book-api-server:
+    container_name: phone-book-api-server
+    image: phone-book-api-server
+    build:
+      context: ./phone-book-api-server
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432/postgres
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+volumes:
+  db:
+    driver: local
