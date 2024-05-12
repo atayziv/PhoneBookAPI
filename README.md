@@ -1,19 +1,11 @@
 # Phone Book API Server #
 
-This folder contains a template of a RESTful API service served on a web server. It uses a uvicorn server, written in
-Python with the FastAPI framework.
+This folder contains a template of a RESTful API service served on a web server. It uses a uvicorn server, written in Python with the FastAPI framework.
 
 ### Assumptions and Instructions ###
-1. I used a postgreSQL database for this project,
-I buried its URL in the .env file in the phone_book_api_server folder, under an environment variable named `DATABASE_URL`, to enable interfacing with the database you must do this as well, this is the template for the url:
-postgresql:///?user={user}&password={password}&database={database}&host={host}&port={port}
-
-2. In terms of necessary records for the table, I assumed that phone number first name and last name are necessary, while email is optional.
-3. I used Python's phonenumbers library to perform validation on phone numbers, note that this is the proper format in Israel: +972********* (9 digits after the prefix).
-4. Also, to enter the other parameters, pay attention to the correctness of the email address, alphabetical names, etc.
-5. To build the docker, in Terminal write in Dockerfile path: `docker build -t phonebook-api:latest .`
-After the build has finished, write in Terminal :` docker run -p 8080:8000 phonebook-api:latest `
-6. Finally, the system can be triggered by Postman, however,
+1. In terms of necessary records for the table, I assumed that phone number first name and last name are necessary, while email is optional.
+2. I used Python's phonenumbers library to perform validation on phone numbers, note that this is the proper format in Israel: +972********* (9 digits after the prefix).
+3. Finally, the system can be triggered by Postman, however,
 It is more than recommended to use `FastAPI's Swagger`, which allows a convenient and easy visual interface for the user!
 To reach it, after running the system, go to localhost:8000/docs.
 
@@ -72,14 +64,29 @@ python phone_book_api_server
 
 After that, the server will be available on port 8000 of the local machine.
 
-### Run tests ###
+### Run Unit Tests ###
 
-The following command runs all the app's tests, linters and security checks (don't forget to run it in the virtual
-environment):
+The following command runs all the app's tests(don't forget to run it in the virtual
+environment, from phone-book-api-server folder path):
 
 ```sh
-tox
+poetry run pytest tests
 ```
+
+The installer of docker-compose is bundled in the Docker installer.
+
+For optimal results, make sure you install the following versions:
+
+* **Docker**: >=20.10.5
+* **docker-compose**: >=1.28.5, <2.0.0
+
+### Start application in production mode ###
+
+In production, the application runs on a docker container. You should have docker installed to run the following command(from project root path):
+```sh
+docker-compose up
+```
+After that, the server will be available on port 8000 of the local machine.
 
 ## Project's structure explained ##
 
