@@ -1,7 +1,7 @@
 [tool.poetry]
-authors = ["OriginAI's Data Eng. Team <dev@originai.co>"]
+authors = ["Atay"]
 description = "A RESTful API using FastAPI"
-name = "fastapi-server"
+name = "Phone-Book-Api-Server"
 version = "0.1.0"
 
 [tool.poetry.dependencies]
@@ -16,8 +16,8 @@ python = "~3.9.0"
 pyvim = "3.0.3"
 pyyaml = "6.0.1"
 uvicorn = {version = "0.14.0", extras = ["standard"]}
-psycopg2 = "^2.9.9"
-psycopg2-binary = "^2.9.9"
+psycopg2 = "2.7.5"
+psycopg2-binary = "2.7.5"
 sqlalchemy = "^2.0.30"
 python-dotenv = "^1.0.1"
 phonenumbers = "^8.13.36"
@@ -49,11 +49,6 @@ requests = "2.26.0"
 tox = "3.24.1"
 types-pyyaml = "5.4.3"
 types-requests = "2.25.6"
-
-[[tool.poetry.source]]
-default = true
-name = "arti"
-url = "https://jf.originai.co/artifactory/api/pypi/pypi/simple"
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

@@ -11,8 +11,9 @@ postgresql:///?user={user}&password={password}&database={database}&host={host}&p
 2. In terms of necessary records for the table, I assumed that phone number first name and last name are necessary, while email is optional.
 3. I used Python's phonenumbers library to perform validation on phone numbers, note that this is the proper format in Israel: +972********* (9 digits after the prefix).
 4. Also, to enter the other parameters, pay attention to the correctness of the email address, alphabetical names, etc.
-
-5. Finally, the system can be triggered by Postman, however,
+5. To build the docker, in Terminal write in Dockerfile path: `docker build -t phonebook-api:latest .`
+After the build has finished, write in Terminal :` docker run -p 8080:8000 phonebook-api:latest `
+6. Finally, the system can be triggered by Postman, however,
 It is more than recommended to use `FastAPI's Swagger`, which allows a convenient and easy visual interface for the user!
 To reach it, after running the system, go to localhost:8000/docs.
 
